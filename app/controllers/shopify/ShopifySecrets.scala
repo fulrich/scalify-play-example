@@ -11,6 +11,7 @@ case class ShopifySecrets (
 
 object ShopifySecrets {
   val ShopifyNamespace = "shopify"
+  lazy val Default: ShopifySecrets = load()
 
   implicit def hint[T]: ProductHint[T] = ProductHint[T](ConfigFieldMapping(CamelCase, CamelCase))
 

@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.shopify.installation.InstallRequest
+import controllers.shopify.installation.{InstallRedirect, InstallRequest}
 import javax.inject._
 import play.api.mvc._
 
@@ -16,9 +16,12 @@ class InstallController  @Inject()(cc: ControllerComponents) extends AbstractCon
   }
 
   def handleParsedInstallRequest(installRequest: InstallRequest): Result = {
-    if (installRequest.valid)
-      Ok("Redirecting based on: " + installRequest.parameters.toString)
-    else
+    if (installRequest.valid) {
+      val installRedirect = InstallRedirect(installRequest)
+      Ok("Redirecting based on: " + installRequest.parameters.toString + s"Redirecting: ${installRedirect.uri}")
+    }
+    else {
       Forbidden("The install request failed HMAC validation.")
+    }
   }
 }
