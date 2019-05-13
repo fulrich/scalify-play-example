@@ -17,7 +17,7 @@ class InstallControllerSpec extends PlaySpec with GuiceOneAppPerTest with Inject
 
       status(install) mustBe OK
       contentType(install) mustBe Some("text/plain")
-      contentAsString(install) must include("ShopifyRequest(b46779487eaa,fredsdevstore.myshopify.com,1557768838)")
+      contentAsString(install) must include("ShopifyRequest(hmac=b46779487eaa&shop=fredsdevstore.myshopify.com&timestamp=1557768838,b46779487eaa,fredsdevstore.myshopify.com,1557768838)")
     }
 
     "return an internal server error if the expected shopify data could not be parsed" in {

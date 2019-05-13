@@ -7,8 +7,17 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.12.8"
 
-libraryDependencies += guice
-libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.2" % Test
+// Production Dependencies
+libraryDependencies ++= Seq(
+  guice,
+  "com.github.pureconfig" %% "pureconfig" % "0.11.0",
+  "io.lemonlabs" %% "scala-uri" % "1.4.5"
+)
+
+// Test Dependencies
+libraryDependencies ++= Seq(
+  "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.2" % Test
+)
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.fredriculrich.controllers._"
