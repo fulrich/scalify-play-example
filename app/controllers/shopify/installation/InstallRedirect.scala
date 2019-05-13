@@ -20,6 +20,7 @@ object InstallRedirect {
       .addParam("scopes" -> "read_orders")
       .addParam("redirect_uri" -> ("https://scalify.heroku.com" + redirectUri))
       .addParam("nonce" -> nonce)
+      .addParam("grant_options[]" -> "")
 
     InstallRedirect(urlBuilder.toString, nonce)
   }
