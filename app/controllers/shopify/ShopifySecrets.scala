@@ -10,7 +10,9 @@ case class ShopifySecrets (
 )
 
 object ShopifySecrets {
-  implicit def hint[T] = ProductHint[T](ConfigFieldMapping(CamelCase, CamelCase))
+  val ShopifyNamespace = "shopify"
 
-  lazy val Default: ShopifySecrets = pureconfig.loadConfigOrThrow[ShopifySecrets]("shopify")
+  implicit def hint[T]: ProductHint[T] = ProductHint[T](ConfigFieldMapping(CamelCase, CamelCase))
+
+  def load(): ShopifySecrets = pureconfig.loadConfigOrThrow[ShopifySecrets](ShopifyNamespace)
 }

@@ -1,23 +1,24 @@
 package controllers
 
-import controllers.shopify.ShopifyRequest
+import controllers.shopify.installation.InstallRequest
 import javax.inject._
 import play.api.mvc._
 
 @Singleton
 class InstallController  @Inject()(cc: ControllerComponents) extends AbstractController(cc) with ApplicationLogging {
   def install() = Action { implicit request: Request[AnyContent] =>
-    val shopify = ShopifyRequest(request.rawQueryString)
+    val installRequest = InstallRequest(request.rawQueryString)
 
-    logger.info("Parsed Request: ")
-    logger.info(shopify.toString)
-
-    shopify match {
-      case Some(validShopifyRequest) => {
-        validShopifyRequest.validate()
-        Ok(validShopifyRequest.toString)
-      }
+    installRequest match {
+      case Some(parsedInstallRequest) => handleParsedInstallRequest(parsedInstallRequest)
       case None => InternalServerError("Invalid Shopify parameters.")
     }
+  }
+
+  def handleParsedInstallRequest(installRequest: InstallRequest): Result = {
+    if (installRequest.valid)
+      Ok("Redirecting based on: " + installRequest.parameters.toString)
+    else
+      Forbidden("The install request failed HMAC validation.")
   }
 }
