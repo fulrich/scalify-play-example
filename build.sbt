@@ -10,6 +10,7 @@ scalaVersion := "2.12.8"
 // Production Dependencies
 libraryDependencies ++= Seq(
   guice,
+  caffeine,
   "com.github.pureconfig" %% "pureconfig" % "0.11.0",
   "io.lemonlabs" %% "scala-uri" % "1.4.5"
 )
