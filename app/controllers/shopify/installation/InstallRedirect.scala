@@ -17,10 +17,9 @@ object InstallRedirect {
   def apply(parameters: InstallParameters, redirectUri: String, nonce: String = UUID.randomUUID.toString): InstallRedirect = {
     val urlBuilder = Url(scheme = "https", host = parameters.shop, path = AuthorizePath)
       .addParam("client_id" -> ShopifySecrets.Default.apiKey)
-      .addParam("scopes" -> "write_orders,read_customers")
+      .addParam("scopes" -> "read_orders")
       .addParam("redirect_uri" -> ("https://scalify.heroku.com" + redirectUri))
       .addParam("nonce" -> nonce)
-      .addParam("access_mode" -> "offline")
 
     InstallRedirect(urlBuilder.toString, nonce)
   }
