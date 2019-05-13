@@ -15,15 +15,14 @@ case class ShopifyRequest(query: String, hmac: String, shop: String, timestamp: 
 
 
   def validate(): Boolean = {
-    logger.info(ShopifySecrets.Default.toString)
-    val scs = new SecretKeySpec(Codec.toUTF8(ShopifySecrets.Default.apiSecret.toCharArray), ShopifyRequest.Algorithm)
+    val secret = new SecretKeySpec(ShopifySecrets.Default.apiSecret.getBytes, ShopifyRequest.Algorithm)
     val mac = Mac.getInstance(ShopifyRequest.Algorithm)
 
-    mac.init(scs)
-    val output = mac.doFinal(Codec.toUTF8(queryWithoutHmac.toCharArray))
+    mac.init(secret)
+    val output = mac.doFinal(queryWithoutHmac.getBytes)
 
     logger.info("Calculated HMAC")
-    logger.info(output.toString)
+    logger.info(new String(output.map(_.toChar)))
 
     logger.info("Given HMAC")
     logger.info(hmac)
