@@ -20,6 +20,7 @@ object InstallRedirect {
       .addParam("scopes" -> "write_orders,read_customers")
       .addParam("redirect_uri" -> redirectUri)
       .addParam("nonce" -> nonce)
+      .addParam("access_mode" -> "")
 
     InstallRedirect(urlBuilder.toString, nonce)
   }
