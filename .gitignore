@@ -1,2 +1,7 @@
+// IntelliJ Files
+.idea
+
+// Scala Files
 *.class
 *.log
+target/
