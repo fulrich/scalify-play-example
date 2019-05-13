@@ -12,6 +12,9 @@ class InstallController  @Inject()(cc: ControllerComponents) extends AbstractCon
     logger.info("Parsed Request: ")
     logger.info(shopify.toString)
 
-    Ok(shopify.toString)
+    shopify match {
+      case Some(validShopifyRequest) => Ok(validShopifyRequest.toString)
+      case None => InternalServerError("Invalid Shopify parameters.")
+    }
   }
 }
