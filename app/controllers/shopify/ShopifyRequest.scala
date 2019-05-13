@@ -22,11 +22,15 @@ case class ShopifyRequest(query: String, hmac: String, shop: String, timestamp: 
     val output = mac.doFinal(queryWithoutHmac.getBytes)
 
     logger.info("Calculated HMAC")
-    logger.info(new String(output.map(_.toChar)))
+    logger.info(hex(output))
 
     logger.info("Given HMAC")
     logger.info(hmac)
     true
+  }
+
+  def hex(bytes: Seq[Byte]): String = {
+    bytes.map("%02x" format _).mkString
   }
 }
 
