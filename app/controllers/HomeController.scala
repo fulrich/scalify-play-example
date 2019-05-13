@@ -10,7 +10,8 @@ import play.api.mvc._
  */
 @Singleton
 class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
-  val logger: Logger = Logger("home")
+  val logger = Logger("application")
+
   /**
    * Create an Action to render an HTML page.
    *
@@ -19,6 +20,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
    * a path of `/`.
    */
   def index() = Action { implicit request: Request[AnyContent] =>
+    logger.info("Testing")
     logger.info(request.queryString.toString)
     Ok(views.html.index())
   }
