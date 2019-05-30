@@ -10,7 +10,7 @@ import shopify.play.HmacAction
 class InstallController  @Inject()(hmacAction: HmacAction, cc: ControllerComponents, cache: SyncCacheApi) extends AbstractController(cc) with ApplicationLogging {
   def install() = hmacAction { implicit request: Request[AnyContent] =>
     val installRedirect = InstallParameters(request.rawQueryString)
-      .map(InstallRedirect(request.host + routes.InstallController.requestAccessCallback().url))
+      .map(InstallRedirect("https://" + request.host + routes.InstallController.requestAccessCallback().url))
 
     logger.info(s"Redirect: $installRedirect")
 
