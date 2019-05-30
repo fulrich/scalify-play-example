@@ -6,7 +6,8 @@ import pureconfig.generic.auto._
 
 case class ShopifyConfiguration(
   apiKey: String,
-  apiSecret: String
+  apiSecret: String,
+  scopes: Seq[String] = Vector.empty
 )
 
 object ShopifyConfiguration {

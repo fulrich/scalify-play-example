@@ -5,13 +5,12 @@ import org.scalatestplus.play._
 import org.scalatestplus.play.guice._
 import play.api.test.Helpers._
 import play.api.test._
+import shopify.ShopifyConfiguration
 import shopify.hmac.ShopifyHmac
 
 
 class InstallControllerSpec extends PlaySpec with GuiceOneServerPerSuite with Injecting with OptionValues {
-
   "InstallController GET" should {
-
     "output the parsed parameters if HMAC is valid" in {
       val controller = app.injector.instanceOf[InstallController]
       val parameters = "shop=fredsdevstore.myshopify.com&timestamp=1557768838"
@@ -20,7 +19,9 @@ class InstallControllerSpec extends PlaySpec with GuiceOneServerPerSuite with In
       val result = controller.install().apply(request)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result).value startsWith s"https://fredsdevstore.myshopify.com"
+      val redirectUri = redirectLocation(result).value
+      redirectUri startsWith s"https://fredsdevstore.myshopify.com"
+      redirectUri contains implicitly[ShopifyConfiguration].scopes.mkString(",")
     }
 
     "return an internal server error if the HMAC is not valid" in {

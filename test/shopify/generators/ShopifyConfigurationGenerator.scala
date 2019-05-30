@@ -9,5 +9,6 @@ object ShopifyConfigurationGenerator {
   def apply(): Gen[ShopifyConfiguration] = for {
     apiKey <- Generate.alpha
     apiSecret <- Generate.alphaNumeric
-  } yield ShopifyConfiguration(apiKey, apiSecret)
+    scopes <- Generate.alpha.tiny.gen.seq
+  } yield ShopifyConfiguration(apiKey, apiSecret, scopes)
 }
