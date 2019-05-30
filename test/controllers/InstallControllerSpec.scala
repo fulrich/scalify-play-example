@@ -20,8 +20,8 @@ class InstallControllerSpec extends PlaySpec with GuiceOneServerPerSuite with In
 
       status(result) mustBe SEE_OTHER
       val redirectUri = redirectLocation(result).value
-      redirectUri startsWith s"https://fredsdevstore.myshopify.com"
-      redirectUri contains implicitly[ShopifyConfiguration].scopes.mkString(",")
+      redirectUri must startWith (s"https://fredsdevstore.myshopify.com")
+      redirectUri must include (implicitly[ShopifyConfiguration].scopes.mkString(","))
     }
 
     "return an internal server error if the HMAC is not valid" in {
