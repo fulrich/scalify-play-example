@@ -1,4 +1,4 @@
-package controllers.shopify.installation
+package shopify.installation
 
 import io.lemonlabs.uri.QueryString
 

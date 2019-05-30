@@ -1,19 +1,20 @@
-package controllers.shopify
+package shopify
 
 import pureconfig.{CamelCase, ConfigFieldMapping}
 import pureconfig.generic.ProductHint
 import pureconfig.generic.auto._
 
-case class ShopifySecrets (
+case class ShopifyConfiguration(
   apiKey: String,
   apiSecret: String
 )
 
-object ShopifySecrets {
+object ShopifyConfiguration {
   val ShopifyNamespace = "shopify"
-  lazy val Default: ShopifySecrets = load()
 
   implicit def hint[T]: ProductHint[T] = ProductHint[T](ConfigFieldMapping(CamelCase, CamelCase))
 
-  def load(): ShopifySecrets = pureconfig.loadConfigOrThrow[ShopifySecrets](ShopifyNamespace)
+  def load(): ShopifyConfiguration = pureconfig.loadConfigOrThrow[ShopifyConfiguration](ShopifyNamespace)
+
+  implicit val DefaultConfiguration: ShopifyConfiguration = load()
 }

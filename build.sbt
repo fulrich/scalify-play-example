@@ -17,7 +17,8 @@ libraryDependencies ++= Seq(
 
 // Test Dependencies
 libraryDependencies ++= Seq(
-  "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.2" % Test
+  "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.2" % Test,
+  "com.github.fulrich" %% "test-charged" % "0.1.12" % Test
 )
 
 // Adds additional packages into Twirl

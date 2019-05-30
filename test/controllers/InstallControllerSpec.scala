@@ -1,12 +1,11 @@
 package controllers
 
-import controllers.shopify.ShopifyHmac
-import controllers.shopify.installation.{InstallParameters, InstallRedirect}
-import org.scalatest.{Matchers, OptionValues}
+import org.scalatest.OptionValues
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice._
 import play.api.test.Helpers._
 import play.api.test._
+import shopify.hmac.ShopifyHmac
 
 
 class InstallControllerSpec extends PlaySpec with GuiceOneServerPerSuite with Injecting with OptionValues {
@@ -38,11 +37,13 @@ class InstallControllerSpec extends PlaySpec with GuiceOneServerPerSuite with In
 
     "return an internal server error if the expected shopify data could not be parsed" in {
       val controller = app.injector.instanceOf[InstallController]
-      val request = FakeRequest(GET, "/install?shop=fredsdevstore.myshopify.com&timestamp=1557768838")
+      val parameters = "timestamp=1557768838"
+      val validHmac = ShopifyHmac.calculateHmac(parameters)
+      val request = FakeRequest(GET, s"/install?hmac=$validHmac&$parameters")
       val install = controller.install().apply(request)
 
       status(install) mustBe INTERNAL_SERVER_ERROR
-      contentAsString(install) must include("Invalid Shopify parameters")
+      contentAsString(install) must include("Unable to process the installation request.")
     }
   }
 }
