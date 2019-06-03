@@ -13,7 +13,7 @@ case class ValidateHmac[A](action: Action[A]) extends Action[A] with play.api.Lo
   def apply(request: Request[A]): Future[Result] = {
     HmacRequest.forQueryString(request) match {
       case Valid(validRequest) => action(validRequest)
-      case Invalid => Future.successful(Forbidden("The install request failed HMAC validation."))
+      case Invalid => Future.successful(Forbidden("The request failed HMAC validation."))
     }
   }
 }

@@ -33,7 +33,7 @@ class InstallControllerSpec extends PlaySpec with GuiceOneServerPerSuite with In
 
       status(install) mustBe FORBIDDEN
       contentType(install) mustBe Some("text/plain")
-      contentAsString(install) must include("The install request failed HMAC validation")
+      contentAsString(install) must include("The request failed HMAC validation")
     }
 
     "return an internal server error if the expected shopify data could not be parsed" in {

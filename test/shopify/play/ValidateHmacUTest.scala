@@ -27,7 +27,7 @@ class ValidateHmacUTest extends FunSuite with Matchers {
     val result: Future[Result] = ValidateHmac(testAction)(request)
     status(result) shouldBe FORBIDDEN
     contentType(result) shouldBe Some("text/plain")
-    contentAsString(result) should include("The install request failed HMAC validation")
+    contentAsString(result) should include("The request failed HMAC validation")
   }
 
   test("Validate HMAC will run the action if the HMAC is valid") {
