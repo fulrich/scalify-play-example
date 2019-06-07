@@ -1,6 +1,5 @@
 package shopify.installation
 
-import io.lemonlabs.uri.QueryString
 
 case class InstallParameters(
   shop: String,
@@ -11,9 +10,17 @@ object InstallParameters {
   val ShopKey = "shop"
   val TimestampKey = "timestamp"
 
-  def apply(query: String): Option[InstallParameters] = for {
-    parsedQuery <- QueryString.parseOption(query)
-    parsedShop <- parsedQuery.param(ShopKey)
-    parsedTimestamp <- parsedQuery.param(TimestampKey)
-  } yield InstallParameters(parsedShop, parsedTimestamp)
+  def apply(shop: Option[String], timestamp: Option[String]): Option[InstallParameters] = for {
+    unpackedShop <- shop
+    unpackedTimestamp <- timestamp
+  } yield InstallParameters(unpackedShop, unpackedTimestamp)
+
+  def fromMap(parameters: Map[String, String]): Option[InstallParameters] =
+    apply(shop = parameters.get(ShopKey), timestamp = parameters.get(TimestampKey))
+
+  def fromSeqMap(parameters: Map[String, Seq[String]]): Option[InstallParameters] =
+    apply(
+      shop = parameters.get(ShopKey).flatMap(_.headOption),
+      timestamp = parameters.get(TimestampKey).flatMap(_.headOption)
+    )
 }
