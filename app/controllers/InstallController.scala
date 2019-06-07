@@ -30,7 +30,7 @@ class InstallController  @Inject()(hmacAction: HmacAction, cc: ControllerCompone
   def nonceKey(shop: String): String = shop + "-nonce"
 
   def requestAccessCallback = Action { request =>
-    val cachedNonce = request.getQueryString("shop").map(nonceKey).flatMap(cache.get[String].apply
+    val cachedNonce = request.getQueryString("shop").map(nonceKey).flatMap(cache.get[String])
     val providedNonce = request.getQueryString("nonce")
 
     Ok(s"Cached Nonce: $cachedNonce || Provided Nonce: $providedNonce")
