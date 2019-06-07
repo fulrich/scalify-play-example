@@ -29,7 +29,7 @@ object AuthorizeRedirect {
   val ClientIdKey = "client_id"
   val ScopesKey = "scope"
   val CallbackUriKey = "redirect_uri"
-  val NonceKey = "nonce"
+  val NonceKey = "state"
   val ScopesDelimiter = ","
 
   def apply(parameters: InstallParameters, redirectUri: String)
