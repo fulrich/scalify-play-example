@@ -17,7 +17,6 @@ object AuthorizeRedirectGenerator {
   def fromParameters(parameters: InstallParameters)(implicit configuration: ShopifyConfiguration): Gen[AuthorizeRedirect] =
     for {
       callbackUri <- Generate.alpha
-      scopes <- Generate.alpha.tiny.gen.seq
       nonce <- Generate.uuid.map(_.toString)
     } yield AuthorizeRedirect(configuration.apiKey, parameters.shop, callbackUri, configuration.scopes, nonce)
 }
