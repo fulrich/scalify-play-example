@@ -10,7 +10,7 @@ import shopify.play.installation.InstallCallbackUri
 
 @Singleton
 class InstallController  @Inject()(hmacAction: HmacAction, cc: ControllerComponents, cache: SyncCacheApi) extends AbstractController(cc) with ApplicationLogging {
-  def install() = hmacAction { implicit request: Request[AnyContent] =>
+  def install = hmacAction { implicit request: Request[AnyContent] =>
     val installRedirect = AuthorizeRedirect.fromSeqMap(
       parameters = request.queryString,
       redirectUri = InstallCallbackUri(routes.InstallController.requestAccessCallback())
@@ -22,17 +22,26 @@ class InstallController  @Inject()(hmacAction: HmacAction, cc: ControllerCompone
     }
   }
 
+  def nonceKey(shop: String): String = shop + "-nonce"
+
   def cacheAndRedirect(authorizeRedirect: AuthorizeRedirect): Result = {
     cache.set(nonceKey(authorizeRedirect.shop), authorizeRedirect.nonce)
     Redirect(authorizeRedirect.uri)
   }
 
-  def nonceKey(shop: String): String = shop + "-nonce"
-
   def requestAccessCallback = hmacAction { request =>
-    val cachedNonce = request.getQueryString("shop").map(nonceKey).flatMap(cache.get[String])
-    val providedNonce = request.getQueryString("state")
+    val cachedNonceOption = request.getQueryString("shop").map(nonceKey).flatMap(cache.get[String])
+    val providedNonceOption = request.getQueryString("state")
 
-    Ok(s"Cached Nonce: $cachedNonce || Provided Nonce: $providedNonce")
+    val nonceConfirmation = for {
+      cachedNonce <- cachedNonceOption
+      providedNonce <- providedNonceOption
+    } yield cachedNonce == providedNonce
+
+    nonceConfirmation match {
+      case Some(true) => Ok("Installation Successful!")
+      case Some(false) => InternalServerError("Could not validate the provided nonce.")
+      case None => InternalServerError("Some required information was not available.")
+    }
   }
 }
