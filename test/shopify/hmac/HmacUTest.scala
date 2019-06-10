@@ -14,8 +14,8 @@ class HmacUTest extends FunSuite with Matchers with GeneratorDrivenPropertyCheck
     forAll(Generate.alphaNumeric.large) { payload =>
       val validHmac = ShopifyHmac.calculateHmac(payload)
 
-      Hmac(validHmac, payload).isValid shouldBe true
-      Hmac(validHmac, payload) shouldBe a[Valid[_]]
+      Hmac.apply(validHmac, payload).isValid shouldBe true
+      Hmac.apply(validHmac, payload) shouldBe a[Valid[_]]
     }
   }
 
