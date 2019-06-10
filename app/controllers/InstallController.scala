@@ -63,10 +63,10 @@ class InstallController  @Inject()(hmacAction: HmacAction, cc: ControllerCompone
       "code" -> code
     )
 
-    logger.info(s"https://$shop.myshopify.com/admin/oauth/access_token")
+    logger.info(s"https://$shop/admin/oauth/access_token")
     logger.info(jsonPayload.toString)
 
-    ws.url(s"https://$shop.myshopify.com/admin/oauth/access_token").post(jsonPayload).map { result =>
+    ws.url(s"https://$shop/admin/oauth/access_token").post(jsonPayload).map { result =>
       logger.info(result.body.toString)
       Ok(result.body.toString)
     }
