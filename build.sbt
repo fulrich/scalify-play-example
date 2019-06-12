@@ -1,24 +1,22 @@
 // Publishing Information
-inThisBuild(List(
-  name := """scalify-play-example""",
-  organization := "com.github.fulrich",
-  homepage := Some(url("https://github.com/fulrich/scalify")),
-  licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
-  developers := List(
-    Developer(
-      "fulrich",
-      "Fredric Ulrich",
-      "9284621+fulrich@users.noreply.github.com",
-      url("https://www.fredriculrich.com")
-    )
-  ),
-  version := "1.0.0-SNAPSHOT",
-  scalaVersion := "2.12.8",
-  resolvers ++= Seq(
-    Resolver.sonatypeRepo("releases"),
-    Resolver.sonatypeRepo("public")
+name := """scalify-play-example"""
+organization := "com.github.fulrich"
+homepage := Some(url("https://github.com/fulrich/scalify"))
+licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
+developers := List(
+  Developer(
+    "fulrich",
+    "Fredric Ulrich",
+    "9284621+fulrich@users.noreply.github.com",
+    url("https://www.fredriculrich.com")
   )
-))
+)
+version := "1.0.0-SNAPSHOT"
+scalaVersion := "2.12.8"
+resolvers ++= Seq(
+  Resolver.sonatypeRepo("releases"),
+  Resolver.sonatypeRepo("public")
+)
 
 // Play Framework Plugins
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
