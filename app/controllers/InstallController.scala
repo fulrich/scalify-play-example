@@ -1,28 +1,32 @@
 package controllers
 
+import com.github.fulrich.scalify.ShopifyConfiguration
+import com.github.fulrich.scalify.installation.AuthorizeRedirect
+import com.github.fulrich.scalify.play.hmac.HmacAction
+import com.github.fulrich.scalify.play.installation.InstallCallbackUri
 import javax.inject._
-import play.api.Logger
 import play.api.cache.SyncCacheApi
+import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc._
-import shopify.installation.AuthorizeRedirect
-import shopify.play.HmacAction
-import shopify.play.installation.InstallCallbackUri
-import play.api.libs.json._
-import shopify.ShopifyConfiguration
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
 @Singleton
-class InstallController  @Inject()(hmacAction: HmacAction, cc: ControllerComponents, cache: SyncCacheApi, ws: WSClient) extends AbstractController(cc) with ApplicationLogging {
+class InstallController  @Inject()(
+  hmacAction: HmacAction,
+  cc: ControllerComponents,
+  cache: SyncCacheApi,
+  ws: WSClient,
+  configuration: ShopifyConfiguration) extends AbstractController(cc) with ApplicationLogging {
 
   def install = hmacAction { implicit request: Request[AnyContent] =>
     val installRedirect = AuthorizeRedirect.fromSeqMap(
       parameters = request.queryString,
       redirectUri = InstallCallbackUri(routes.InstallController.requestAccessCallback())
-    )
+    )(configuration)
 
     installRedirect match {
       case Some(parsedAuthorizeRedirect) => cacheAndRedirect(parsedAuthorizeRedirect)
@@ -58,8 +62,8 @@ class InstallController  @Inject()(hmacAction: HmacAction, cc: ControllerCompone
     val code = request.getQueryString("code").get
 
     val jsonPayload = Json.obj(
-      "client_id" -> ShopifyConfiguration.DefaultConfiguration.apiKey,
-        "client_secret" -> ShopifyConfiguration.DefaultConfiguration.apiSecret,
+      "client_id" -> configuration.apiKey,
+        "client_secret" -> configuration.apiSecret,
       "code" -> code
     )
 

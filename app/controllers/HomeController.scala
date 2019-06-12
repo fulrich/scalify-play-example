@@ -10,8 +10,6 @@ import play.api.mvc._
  */
 @Singleton
 class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) with ApplicationLogging {
-
-
   def index() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.index())
   }
