@@ -1,11 +1,13 @@
 package controllers
 
 import com.github.fulrich.scalify.ShopifyConfiguration
-import com.github.fulrich.scalify.installation.{AuthorizeRedirect, InstallConfirmation}
+import com.github.fulrich.scalify.installation.{AuthorizeConfirmation, AuthorizeRedirect, TokenRequest}
+import com.github.fulrich.scalify.play.installation.json._
 import com.github.fulrich.scalify.play.installation.{InstallActions, InstallCallbackUri}
 import javax.inject._
 import play.api.cache.SyncCacheApi
 import play.api.libs.json._
+import play.api.libs.ws.JsonBodyWritables._
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 
@@ -22,10 +24,8 @@ class InstallController  @Inject()(
   configuration: ShopifyConfiguration) extends AbstractController(cc) with ApplicationLogging {
 
   def install() = actions.install { implicit request =>
-    val authorizeRedirect = AuthorizeRedirect(
-      parameters = request.parameters,
-      redirectUri = InstallCallbackUri(routes.InstallController.requestAccessCallback())
-    )(configuration)
+    val authorizeConfirmationUri = InstallCallbackUri(routes.InstallController.requestAccessCallback())
+    val authorizeRedirect = AuthorizeRedirect(request.parameters, authorizeConfirmationUri)(configuration)
 
     cache.set(request.parameters.shop + "-nonce", authorizeRedirect.nonce)
     Redirect(authorizeRedirect.uri)
@@ -38,18 +38,13 @@ class InstallController  @Inject()(
     else Future.successful(InternalServerError("Could not validate the provided nonce."))
   }
 
-
-  def requestToken(confirmation: InstallConfirmation): Future[Result] = {
-    val jsonPayload = Json.obj(
-      "client_id" -> configuration.apiKey,
-        "client_secret" -> configuration.apiSecret,
-      "code" -> confirmation.authorizationCode
-    )
+  def requestToken(confirmation: AuthorizeConfirmation): Future[Result] = {
+    val tokenRequest = TokenRequest(confirmation)(configuration)
 
     logger.info(s"https://${confirmation.shop}/admin/oauth/access_token")
-    logger.info(jsonPayload.toString)
+    logger.info(Json.toJson(tokenRequest).toString)
 
-    ws.url(s"https://${confirmation.shop}/admin/oauth/access_token").post(jsonPayload).map { result =>
+    ws.url(s"https://${confirmation.shop}/admin/oauth/access_token").post(Json.toJson(tokenRequest)).map { result =>
       logger.info(result.body.toString)
       Ok(result.body.toString)
     }
