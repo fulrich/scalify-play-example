@@ -11,7 +11,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 // Versions
 val V = new {
-  val Scalify = "0.0.14"
+  val Scalify = "0.0.15"
   val ScalaTest = "4.0.2"
   val TestCharged = "0.1.12"
 }

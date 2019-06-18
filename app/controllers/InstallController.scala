@@ -1,7 +1,7 @@
 package controllers
 
 import com.github.fulrich.scalify.ShopifyConfiguration
-import com.github.fulrich.scalify.installation.{AuthorizeConfirmation, AuthorizeRedirect, TokenRequest}
+import com.github.fulrich.scalify.installation.{AuthorizeRedirect, TokenRequest}
 import com.github.fulrich.scalify.play.installation.json._
 import com.github.fulrich.scalify.play.installation.{InstallActions, InstallCallbackUri}
 import javax.inject._
@@ -12,11 +12,10 @@ import play.api.libs.ws.WSClient
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 
 @Singleton
-class InstallController  @Inject()(
+class InstallController @Inject()(
   actions: InstallActions,
   cc: ControllerComponents,
   cache: SyncCacheApi,
@@ -24,7 +23,7 @@ class InstallController  @Inject()(
   configuration: ShopifyConfiguration) extends AbstractController(cc) with ApplicationLogging {
 
   def install() = actions.install { implicit request =>
-    val authorizeConfirmationUri = InstallCallbackUri(routes.InstallController.requestAccessCallback())
+    val authorizeConfirmationUri = InstallCallbackUri(routes.InstallController.authorize())
     val authorizeRedirect = AuthorizeRedirect(request.parameters, authorizeConfirmationUri)(configuration)
 
     logger.info(s"Storing nonce ${authorizeRedirect.nonce}")
@@ -34,23 +33,16 @@ class InstallController  @Inject()(
     Redirect(authorizeRedirect.uri)
   }
 
-  def requestAccessCallback() = actions.authorize.async { request =>
-    val isNonceValid = request.parameters.validateNonce(cache.get[String](request.parameters.shop + "-nonce"))
+  def authorize() = actions.authorize.async { request =>
+    request.withValidNonce(cache.get[String](request.confirmation.shop + "-nonce")).async { confirmation =>
+      val tokenRequest = TokenRequest(confirmation)(configuration)
 
-    logger.info("Validating Nonce")
-    if (isNonceValid) requestToken(request.parameters)
-    else Future.successful(InternalServerError("Could not validate the provided nonce."))
-  }
-
-  def requestToken(confirmation: AuthorizeConfirmation): Future[Result] = {
-    val tokenRequest = TokenRequest(confirmation)(configuration)
-
-    logger.info(s"https://${confirmation.shop}/admin/oauth/access_token")
-    logger.info(Json.toJson(tokenRequest).toString)
-
-    ws.url(s"https://${confirmation.shop}/admin/oauth/access_token").post(Json.toJson(tokenRequest)).map { result =>
-      logger.info(result.body.toString)
-      Ok(result.body.toString)
+      ws.url(TokenRequest.uri(confirmation.shop))
+        .post(Json.toJson(tokenRequest))
+        .map { result =>
+          logger.info(result.body.toString)
+          Ok(result.body.toString)
+        }
     }
   }
 }
