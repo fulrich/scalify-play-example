@@ -1,9 +1,8 @@
 package controllers
 
 import com.github.fulrich.scalify.ShopifyConfiguration
-import com.github.fulrich.scalify.installation.AuthorizeRedirect
-import com.github.fulrich.scalify.play.hmac.HmacAction
-import com.github.fulrich.scalify.play.installation.InstallCallbackUri
+import com.github.fulrich.scalify.installation.{AuthorizeRedirect, InstallConfirmation}
+import com.github.fulrich.scalify.play.installation.{InstallActions, InstallCallbackUri}
 import javax.inject._
 import play.api.cache.SyncCacheApi
 import play.api.libs.json._
@@ -16,61 +15,41 @@ import scala.concurrent.Future
 
 @Singleton
 class InstallController  @Inject()(
-  hmacAction: HmacAction,
+  actions: InstallActions,
   cc: ControllerComponents,
   cache: SyncCacheApi,
   ws: WSClient,
   configuration: ShopifyConfiguration) extends AbstractController(cc) with ApplicationLogging {
 
-  def install = hmacAction { implicit request: Request[AnyContent] =>
-    val installRedirect = AuthorizeRedirect.fromSeqMap(
-      parameters = request.queryString,
+  def install() = actions.install { implicit request =>
+    val authorizeRedirect = AuthorizeRedirect(
+      parameters = request.parameters,
       redirectUri = InstallCallbackUri(routes.InstallController.requestAccessCallback())
     )(configuration)
 
-    installRedirect match {
-      case Some(parsedAuthorizeRedirect) => cacheAndRedirect(parsedAuthorizeRedirect)
-      case None => InternalServerError("Unable to process the installation request.")
-    }
-  }
-
-  def nonceKey(shop: String): String = shop + "-nonce"
-
-  def cacheAndRedirect(authorizeRedirect: AuthorizeRedirect): Result = {
-    cache.set(nonceKey(authorizeRedirect.shop), authorizeRedirect.nonce)
+    cache.set(request.parameters.shop + "-nonce", authorizeRedirect.nonce)
     Redirect(authorizeRedirect.uri)
   }
 
-  def requestAccessCallback = hmacAction.async { request =>
-    val cachedNonceOption = request.getQueryString("shop").map(nonceKey).flatMap(cache.get[String])
-    val providedNonceOption = request.getQueryString("state")
+  def requestAccessCallback() = actions.authorize.async { request =>
+    val isNonceValid = request.parameters.validateNonce(cache.get[String](request.parameters.shop + "-nonce"))
 
-    val nonceConfirmation = for {
-      cachedNonce <- cachedNonceOption
-      providedNonce <- providedNonceOption
-    } yield cachedNonce == providedNonce
-
-    nonceConfirmation match {
-      case Some(true) => requestToken(request)
-      case Some(false) => Future.successful(InternalServerError("Could not validate the provided nonce."))
-      case None => Future.successful(InternalServerError("Some required information was not available."))
-    }
+    if (isNonceValid) requestToken(request.parameters)
+    else Future.successful(InternalServerError("Could not validate the provided nonce."))
   }
 
-  def requestToken(request: Request[_]): Future[Result] = {
-    val shop = request.getQueryString("shop").get
-    val code = request.getQueryString("code").get
 
+  def requestToken(confirmation: InstallConfirmation): Future[Result] = {
     val jsonPayload = Json.obj(
       "client_id" -> configuration.apiKey,
         "client_secret" -> configuration.apiSecret,
-      "code" -> code
+      "code" -> confirmation.authorizationCode
     )
 
-    logger.info(s"https://$shop/admin/oauth/access_token")
+    logger.info(s"https://${confirmation.shop}/admin/oauth/access_token")
     logger.info(jsonPayload.toString)
 
-    ws.url(s"https://$shop/admin/oauth/access_token").post(jsonPayload).map { result =>
+    ws.url(s"https://${confirmation.shop}/admin/oauth/access_token").post(jsonPayload).map { result =>
       logger.info(result.body.toString)
       Ok(result.body.toString)
     }
