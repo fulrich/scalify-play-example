@@ -4,7 +4,7 @@ import com.github.fulrich.scalify.generators.installation.InstallParametersGener
 import com.github.fulrich.scalify.hmac.ShopifyHmac
 import com.github.fulrich.scalify.installation.InstallParameters
 import com.github.fulrich.scalify.play.ShopifyInjectedApplication
-import com.github.fulrich.scalify.play.installation.InstallParametersBinding
+import com.github.fulrich.scalify.play.serialization.url.installation.InstallParametersBindable
 import com.github.fulrich.testcharged.generators._
 import org.scalatest.OptionValues
 import org.scalatestplus.play._
@@ -15,7 +15,7 @@ import play.api.test._
 
 class InstallControllerSpec extends PlaySpec with GuiceOneAppPerTest with ShopifyInjectedApplication with OptionValues {
   val parameters: InstallParameters = InstallParametersGenerator().value
-  val parametersQueryString: String = InstallParametersBinding.unbind(parameters)
+  val parametersQueryString: String = InstallParametersBindable.unbind(parameters)
   def controller: InstallController = inject[InstallController]
 
   "InstallController GET" should {

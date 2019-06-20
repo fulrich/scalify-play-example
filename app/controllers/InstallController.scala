@@ -2,7 +2,7 @@ package controllers
 
 import com.github.fulrich.scalify.ShopifyConfiguration
 import com.github.fulrich.scalify.installation.{AuthorizeRedirect, TokenRequest}
-import com.github.fulrich.scalify.play.installation.json._
+import com.github.fulrich.scalify.play.serialization.json._
 import com.github.fulrich.scalify.play.installation.{InstallActions, InstallCallbackUri}
 import javax.inject._
 import play.api.cache.SyncCacheApi
