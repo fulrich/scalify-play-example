@@ -1,7 +1,9 @@
 package controllers
 
+import java.time.Instant
+
 import com.github.fulrich.scalify.ShopifyConfiguration
-import com.github.fulrich.scalify.installation.{AuthorizeRedirect, TokenRequest}
+import com.github.fulrich.scalify.installation.{AuthorizeRedirect, InstallParameters, TokenRequest}
 import com.github.fulrich.scalify.play.serialization.json._
 import com.github.fulrich.scalify.play.installation.{InstallActions, InstallCallbackUri}
 import javax.inject._
@@ -22,14 +24,25 @@ class InstallController @Inject()(
   ws: WSClient,
   configuration: ShopifyConfiguration) extends AbstractController(cc) with ApplicationLogging {
 
+  def unsafeInstall() = Action { implicit request =>
+    val shop = request.getQueryString("shop")
+    val installParameters = InstallParameters(shop.get, Instant.now)
+
+    redirectToShopifyForAuthorization(installParameters)
+  }
+
   def install() = actions.install { implicit request =>
+    redirectToShopifyForAuthorization(request.parameters)
+  }
+
+  def redirectToShopifyForAuthorization(parameters: InstallParameters)(implicit request: Request[_]): Result = {
     val authorizeConfirmationUri = InstallCallbackUri(routes.InstallController.authorize())
-    val authorizeRedirect = AuthorizeRedirect(request.parameters, authorizeConfirmationUri)(configuration)
+    val authorizeRedirect = AuthorizeRedirect(parameters, authorizeConfirmationUri)(configuration)
 
     logger.info(s"Storing nonce ${authorizeRedirect.nonce}")
     logger.info(s"Redirecting to ${authorizeRedirect.uri}")
 
-    cache.set(request.parameters.shop + "-nonce", authorizeRedirect.nonce)
+    cache.set(parameters.shop + "-nonce", authorizeRedirect.nonce)
     Redirect(authorizeRedirect.uri)
   }
 
