@@ -5,7 +5,7 @@ name := """scalify-play-example"""
 organization := "com.github.fulrich"
 licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"))
 version := "1.0.0-SNAPSHOT"
-scalaVersion := "2.12.8"
+scalaVersion := "2.13.0"
 
 // Resolvers
 resolvers ++= Seq(

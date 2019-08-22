@@ -2,7 +2,7 @@ import sbt._
 
 object Scalify {
   val ProjectFile = file("../scalify/")
-  val DevelopmentMode: Boolean = false
+  val DevelopmentMode: Boolean = ProjectFile.exists
   val ProductionMode: Boolean = !DevelopmentMode
 
   val DependsOn: Seq[ClasspathDep[ProjectReference]] =
