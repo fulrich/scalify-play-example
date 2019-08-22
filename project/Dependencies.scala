@@ -3,7 +3,7 @@ import sbt._
 // Versions
 object Dependencies {
   val Scalify = new {
-    val Version = "0.0.17"
+    val Version = "0.0.18"
     val Core = "com.github.fulrich" %% "scalify" % Version
     val PlusPlay = "com.github.fulrich" %% "scalifyplus-play" % Version
   }

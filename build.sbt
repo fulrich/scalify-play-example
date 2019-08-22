@@ -15,11 +15,11 @@ resolvers ++= Seq(
 
 // Setup App Settings
 lazy val root = (project in file("."))
-  .dependsOn(Development.ScalifyDependsOn: _*)
+  .dependsOn(Scalify.DependsOn: _*)
   .enablePlugins(PlayScala)
 
 // Production Dependencies
-libraryDependencies ++= Development.ScalifyLibraryDependencies
+libraryDependencies ++= Scalify.LibraryDependencies
 
 libraryDependencies ++= Seq(
   guice,
