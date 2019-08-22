@@ -1,10 +1,13 @@
-// Mac Files
+# Shopify Files
+.env
+
+# Mac Files
 .DS_STORE
 
-// IntelliJ Files
+# IntelliJ Files
 .idea
 
-// Scala Files
+# Scala Files
 *.class
 *.log
 target/

@@ -25,8 +25,8 @@ libraryDependencies ++= Seq(
   guice,
   caffeine,
   ws,
-  "com.github.pureconfig" %% "pureconfig" % "0.11.0",
-  "io.lemonlabs" %% "scala-uri" % "1.4.5"
+  Dependencies.PureConfig.Core,
+  Dependencies.ScalaUri.Core
 )
 
 // Test Dependencies
