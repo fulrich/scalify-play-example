@@ -8,8 +8,8 @@ object Scalify {
   val DependsOn: Seq[ClasspathDep[ProjectReference]] =
     if (ProductionMode) Seq.empty
     else Seq (
-      ProjectRef(ProjectFile, "scalify")  % "test->test;compile->compile",
-      ProjectRef(ProjectFile, "scalifyplusplay")  % "test->test;compile->compile"
+      ProjectRef(ProjectFile, "core")  % "test->test;compile->compile",
+      ProjectRef(ProjectFile, "plusplay")  % "test->test;compile->compile"
     )
 
   val LibraryDependencies: Seq[ModuleID] =

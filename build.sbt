@@ -1,5 +1,3 @@
-import Dependencies._
-
 // Publishing Information
 name := """scalify-play-example"""
 organization := "com.github.fulrich"
